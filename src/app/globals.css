@@ -1,15 +1,18 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --background: #ffffff;
+  /* Default light mode colors */
+  --background: #fdfdfd;
   --foreground: #171717;
-}
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Mesh Gradient Colors (Monochromatic) */
+  --gradient-color-1: #800000; /* Vinho Tinto */
+  --gradient-color-2: #D9480F; /* Laranja Queimado */
+  --gradient-color-3: #AD1457; /* Rosa Profundo/Magenta */
 }
 
 @media (prefers-color-scheme: dark) {
@@ -20,7 +23,67 @@
 }
 
 body {
-  background: var(--background);
+  background: #1a0505; /* Tom muito escuro de bordeaux */
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"; /* Sans-serif premium */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5; /* Espaçamento de linha */
+  font-size: 1.125rem; /* text-lg */
+  overflow: hidden; /* Para prevenir scrollbars da animação do gradiente */
+  position: relative;
+  min-height: 100dvh; /* Garante que o body ocupa a altura total do viewport */
+}
+
+/* Mesh Gradient Background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(at 0% 0%, var(--gradient-color-1) 0%, transparent 50%),
+              radial-gradient(at 100% 0%, var(--gradient-color-2) 0%, transparent 50%),
+              radial-gradient(at 0% 100%, var(--gradient-color-3) 0%, transparent 50%);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  animation: mesh-gradient-animation 15s ease infinite alternate; /* Animação de opacidade mais suave */
+  will-change: opacity; /* Otimização para opacidade */
+  z-index: -2; /* Abaixo do conteúdo */
+  pointer-events: none; /* Não interfere com cliques */
+  filter: blur(120px); /* Suaviza as manchas do gradiente */
+  opacity: 0.7; /* Mistura subtilmente com o background base */
+}
+
+@keyframes mesh-gradient-animation {
+  0% { opacity: 0.4; }
+  100% { opacity: 0.8; }
+}
+
+/* Analog Noise Overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-size: 100px 100px; /* Ajustar tamanho para densidade de grão desejada */
+  opacity: 0.04; /* Ruído muito subtil */
+  pointer-events: none;
+  z-index: -1; /* Acima do gradiente, abaixo do conteúdo */
+  mix-blend-mode: overlay; /* Mistura-se bem */
+}
+
+/* Custom classes for adaptive text color (to be used in components) */
+.text-adaptive-light {
+  color: #ededed;
+  text-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
+}
+
+.text-adaptive-dark {
+  color: #1a1a1a;
+  text-shadow: 0px 0px 4px rgba(255, 255, 255, 0.3);
 }
