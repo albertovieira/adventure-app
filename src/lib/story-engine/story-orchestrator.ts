@@ -1,32 +1,8 @@
 import { StoryState, StorySegment, WorldState, GeminiResponse } from './types';
 import { buildDynamicSystemPrompt } from '../ai/gemini-prompts';
+import { getGeminiCompletion } from '../ai/gemini-client'; // Importa o cliente Gemini real
 
-/**
- * Função simulada para interagir com o endpoint da nossa API que chamará o Gemini.
- * Em um ambiente real, esta função faria uma requisição `fetch` para `'/api/story/generate'`.
- * Por agora, retorna uma resposta JSON simulada.
- * @param systemPrompt O prompt completo do sistema a ser enviado ao Gemini.
- * @param userChoice A última escolha do utilizador.
- * @returns Uma Promise que resolve para a string JSON bruta da resposta do Gemini.
- */
-async function callGeminiApi(systemPrompt: string, userChoice: string | null): Promise<string> {
-  console.log("Chamando Gemini com System Prompt (fragmento):", systemPrompt.substring(0, 500) + '...');
-  console.log("Última escolha do utilizador:", userChoice);
-
-  // Simula um atraso de rede para imitar uma chamada de API real.
-  await new Promise(resolve => setTimeout(resolve, 1500));
-
-  // Resposta mockada que simula a saída esperada do Gemini.
-  const mockResponse: GeminiResponse = {
-    narrative_text: "O ar estagnado na câmara escura trazia o cheiro a mofo e metal oxidado. Um som distante de gotejamento ecoava na penumbra, que era apenas quebrada por um feixe ténue de luz que se esgueirava por uma fenda no teto, iluminando partículas de pó dançantes. A parede rochosa à sua frente parecia húmida ao toque. Uma brisa fria, vinda de uma abertura que antes não notaras, roçou-te a nuca, prometendo um caminho inexplorado.",
-    choices: ["Explorar a fenda de luz", "Procurar a origem do gotejamento", "Tocar na parede húmida", "Investigar a brisa"],
-    mood: "mysterious",
-    image_prompt: "Dark, damp cave, single light beam, ancient metal, subtle cold breeze, sense of exploration",
-    audio_prompt: "Subtle water dripping, distant echoing, faint breeze sound in a cave"
-  };
-
-  return JSON.stringify(mockResponse);
-}
+// A função callGeminiApi simulada será removida, pois agora usamos o getGeminiCompletion.
 
 class StoryOrchestrator {
   private storyState: StoryState;
@@ -125,9 +101,11 @@ class StoryOrchestrator {
     const systemPrompt = this.formatSystemPrompt();
     let geminiRawResponseText: string;
 
-    // 3. Envia o prompt para o modelo (via API simulada por enquanto)
+    // 3. Envia o prompt para o modelo (agora usando o cliente Gemini real)
     try {
-      geminiRawResponseText = await callGeminiApi(systemPrompt, userChoice);
+      // O 'userMessage' para o Gemini será a última escolha do usuário, ou uma indicação de início.
+      const userMessage = userChoice || "Start the narrative.";
+      geminiRawResponseText = await getGeminiCompletion(systemPrompt, userMessage);
     } catch (error) {
       console.error("Erro ao chamar a API do Gemini:", error);
       throw new Error("Não foi possível obter o segmento da história. Por favor, tente novamente.");
