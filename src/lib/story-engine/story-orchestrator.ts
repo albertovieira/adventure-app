@@ -50,7 +50,21 @@ class StoryOrchestrator {
    */
   private parseAndValidateGeminiResponse(rawGeminiResponseText: string): GeminiResponse {
     try {
-      const response: GeminiResponse = JSON.parse(rawGeminiResponseText);
+      // 1. Limpeza de "ruído": remove blocos de código markdown (```json ... ```)
+      let cleanText = rawGeminiResponseText
+        .replace(/```json/g, '')
+        .replace(/```/g, '')
+        .trim();
+
+      // 2. Tenta encontrar o primeiro '{' e o último '}' caso haja texto extra fora do JSON
+      const firstBracket = cleanText.indexOf('{');
+      const lastBracket = cleanText.lastIndexOf('}');
+      
+      if (firstBracket !== -1 && lastBracket !== -1) {
+        cleanText = cleanText.substring(firstBracket, lastBracket + 1);
+      }
+
+      const response: GeminiResponse = JSON.parse(cleanText);
 
       // Validação básica para campos obrigatórios e tipos
       if (
@@ -106,9 +120,10 @@ class StoryOrchestrator {
       // O 'userMessage' para o Gemini será a última escolha do usuário, ou uma indicação de início.
       const userMessage = userChoice || "Start the narrative.";
       geminiRawResponseText = await getGeminiCompletion(systemPrompt, userMessage);
+      console.log("Resposta bruta do Gemini:", geminiRawResponseText);
     } catch (error) {
-      console.error("Erro ao chamar a API do Gemini:", error);
-      throw new Error("Não foi possível obter o segmento da história. Por favor, tente novamente.");
+        console.error('ORCHESTRATOR ERROR:', error);
+        throw error;
     }
 
     // 4. Valida e faz o parse da resposta

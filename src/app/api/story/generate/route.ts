@@ -25,10 +25,12 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Erro na API /api/story/generate:', error);
 
-    // Retorna uma resposta de erro clara
-    return NextResponse.json(
-      { error: 'Não foi possível gerar o próximo segmento da história.', details: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
-    );
+    // Retorna o erro serializado diretamente para o browser
+    return new NextResponse(JSON.stringify(error), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   }
 }
